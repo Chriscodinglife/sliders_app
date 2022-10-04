@@ -28,6 +28,8 @@ class Slides:
         self.creds = None
         self.scopes = [f"{os.getenv('SCOPES')}"]
         self.presentation_id = os.getenv('PRESENTATION_ID')
+        self.service = None
+        self.image_dir = "images"
         
         
     def get_credentials(self):
@@ -54,26 +56,63 @@ class Slides:
         '''
         Create a local image folder for storing images
         '''
-        image_directory = 'images'
-        if not os.path.exists(image_directory):
+        if not os.path.exists(self.image_dir):
             try:      
-                os.mkdir(image_directory)
+                os.mkdir(self.image_dir)
             except OSError as error:
                 print(error)
         else:
-            files = glob.glob(f"{image_directory}/*")
+            files = glob.glob(f"{self.image_dir}/*")
             for file in files:
                 os.remove(file)
+    
+    
+    def set_service(self):
+        '''
+        Return the service for the Google Slides API
+        '''
+        self.service = build('slides', 'v1', credentials=self.creds)
+        
+        return self.service
+        
+        
     
     
     def get_presentation_slides(self):
         '''
         Return the slides of the presentation
         '''
-        service = build('slides', 'v1', credentials=self.creds)
-        presentation = service.presentations().get(presentationId=self.presentation_id).execute()
-        slides = presentation.get('slides')
+        
+        self.set_service = self.set_service()
+        
+        try:
+            presentation = self.service.presentations().get(presentationId=self.presentation_id).execute()
+            slides = presentation.get('slides')
+        except HttpError as error:
+            print(error)
         
         return slides
     
     
+    def download_images(self):
+        '''
+        Download the images from the slides
+        '''
+        
+        slides = self.get_presentation_slides()
+        
+        for i, slide in enumerate(slides):
+            
+            object_id = slide.get("objectId")
+            slide_image = self.service.presentations().pages().getThumbnail(
+                            presentationId=self.presentation_id, 
+                            pageObjectId=object_id,
+                            thumbnailProperties_thumbnailSize='LARGE'
+                            ).execute()
+            content_url = slide_image['contentUrl']
+            
+            image_download = requests.get(content_url)
+            
+            if image_download.status_code == 200:
+                with open(f"{self.image_dir}/image_{i}.png", 'wb') as output_image:
+                    output_image.write(image_download.content)
