@@ -30,6 +30,7 @@ class Slides:
         self.presentation_id = os.getenv('PRESENTATION_ID')
         self.service = None
         self.image_dir = "images"
+        self.output_notes = "notes.json"
         
         
     def get_credentials(self):
@@ -123,10 +124,27 @@ class Slides:
         
         notes = []
         
-        for slide in slides:
-            notes.append(slide.get("notesPage").get("notesProperties").get("notes"))
-            
+        for i, slide in enumerate(slides):
+            #notes.append(slide.get("slideProperties").get("notesPage").get("notesProperties").get("speakerNotesObjectId"))
+            temp = slide.get("slideProperties").get("notesPage").get("pageElements")
+            try:
+                notes.append(temp[1]["shape"]["text"]["textElements"][1]['textRun']['content'])
+            except KeyError as error:
+                notes.append("None")
+                
         return notes
+                
+                
+    def export_notes(self, notes):
+        '''
+        Export the notes to a json file for the frontend
+        '''
+        
+        with open("notes.json", "w") as output_file:
+            json.dump(notes, output_file)
+        
+            
+        
     
     
 def main():
@@ -134,11 +152,9 @@ def main():
     Main run for testing.
     '''
     
-    slides = Slides()
-    slides.get_credentials()
-    notes = slides.get_notes()
-    print(notes)
-    
+    google_slides = Slides()
+    google_slides.get_credentials()
+    slides = google_slides.get_presentation_slides()
 
 if __name__ == "__main__":
     main()
