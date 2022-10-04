@@ -167,3 +167,18 @@ class Slides:
         
         with open(self.output_notes, "w") as output_file:
             json.dump(notes, output_file)
+            
+    
+    def run(self):
+        '''
+        Run the class
+        '''
+        
+        self.get_credentials()
+        self.fresh_image_directory()
+        slides = self.get_presentation_slides()
+        self.download_images(slides)
+        self.resize_images()
+        self.export_images()
+        notes = self.get_notes(slides)
+        self.export_notes(notes)
