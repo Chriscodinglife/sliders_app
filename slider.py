@@ -183,3 +183,16 @@ class Slides:
         self.export_images()
         notes = self.get_notes(slides)
         self.export_notes(notes)
+        
+        
+def main():
+    '''
+    Run the class
+    '''
+    
+    slides = Slides()
+    slides.run()
+    
+    
+if __name__ == "__main__":
+    main()
