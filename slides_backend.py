@@ -94,6 +94,17 @@ class Slides:
         return slides
     
     
+    def print_slides(self):
+        '''
+        Print the slides. Used for troubleshooting
+        '''
+        
+        slides = self.get_presentation_slides()
+        
+        for slide in slides:
+            print(slide)
+    
+    
     def download_images(self):
         '''
         Download the images from the slides
@@ -131,3 +142,18 @@ class Slides:
             notes.append(slide.get("notesPage").get("notesProperties").get("notes"))
             
         return notes
+    
+    
+def main():
+    '''
+    Main run for testing.
+    '''
+    
+    slides = Slides()
+    slides.get_credentials()
+    notes = slides.get_notes()
+    print(notes)
+    
+
+if __name__ == "__main__":
+    main()
