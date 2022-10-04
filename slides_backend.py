@@ -22,12 +22,18 @@ load_dotenv()
 class Slides:
     
     def __init__(self):
+        '''
+        Initialize the class with the following attributes:
+        '''
         self.creds = None
         self.scopes = [f"{os.getenv('SCOPES')}"]
         self.presentation_id = os.getenv('PRESENTATION_ID')
         
         
     def get_credentials(self):
+        '''
+        Set the credentials for the Google Slides API
+        '''
         
         if os.path.exists('token.json'):
             self.creds = Credentials.from_authorized_user_file('token.json', self.scopes)
@@ -44,3 +50,17 @@ class Slides:
                 token.write(self.creds.to_json())
         
     
+    def create_image_directory(self):
+        '''
+        Create a local image folder for storing images
+        '''
+        image_directory = 'images'
+        if not os.path.exists(image_directory):
+            try:      
+                os.mkdir(image_directory)
+            except OSError as error:
+                print(error)
+        else:
+            files = glob.glob(f"{image_directory}/*")
+            for file in files:
+                os.remove(file)
