@@ -50,6 +50,8 @@ class Slides:
             # Save the credentials for the next run
             with open('token.json', 'w') as token:
                 token.write(self.creds.to_json())
+                
+        self.service = build('slides', 'v1', credentials=self.creds)
         
     
     def fresh_image_directory(self):
@@ -65,25 +67,12 @@ class Slides:
             files = glob.glob(f"{self.image_dir}/*")
             for file in files:
                 os.remove(file)
-    
-    
-    def set_service(self):
-        '''
-        Return the service for the Google Slides API
-        '''
-        self.service = build('slides', 'v1', credentials=self.creds)
-        
-        return self.service
-        
-        
-    
+
     
     def get_presentation_slides(self):
         '''
         Return the slides of the presentation
         '''
-        
-        self.set_service = self.set_service()
         
         try:
             presentation = self.service.presentations().get(presentationId=self.presentation_id).execute()
@@ -105,12 +94,10 @@ class Slides:
             print(slide)
     
     
-    def download_images(self):
+    def download_images(self, slides):
         '''
         Download the images from the slides
         '''
-        
-        slides = self.get_presentation_slides()
         
         for i, slide in enumerate(slides):
             
@@ -129,12 +116,10 @@ class Slides:
                     output_image.write(image_download.content)
                     
     
-    def get_notes(self):
+    def get_notes(self, slides):
         '''
         Return the notes from the slides
         '''
-        
-        slides = self.get_presentation_slides()
         
         notes = []
         
