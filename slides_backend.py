@@ -50,7 +50,7 @@ class Slides:
                 token.write(self.creds.to_json())
         
     
-    def create_image_directory(self):
+    def fresh_image_directory(self):
         '''
         Create a local image folder for storing images
         '''
@@ -64,3 +64,6 @@ class Slides:
             files = glob.glob(f"{image_directory}/*")
             for file in files:
                 os.remove(file)
+                
+    
+    
