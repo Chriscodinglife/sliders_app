@@ -13,12 +13,6 @@ from googleapiclient.errors import HttpError
 
 load_dotenv()
 
-# I want to do two things:
-# 1. Download the images from the Google Slides presentation
-# 2. Grab the text from the Google Slides presentation notes area
-# 3. With a specific endpoint, I want to update the images and text in the database
-
-
 class Slides:
     
     def __init__(self):
@@ -31,6 +25,7 @@ class Slides:
         self.service = None
         self.image_dir = "images"
         self.output_notes = "notes.json"
+        self.output_images = "images.json"
         
         
     def get_credentials(self):
@@ -115,8 +110,26 @@ class Slides:
             if image_download.status_code == 200:
                 with open(f"{self.image_dir}/image_{i}.png", 'wb') as output_image:
                     output_image.write(image_download.content)
-                    
-    
+                
+                       
+    def export_images(self):
+        '''
+        Export the images to a json file for the frontend
+        '''
+        
+        images = []
+        
+        files = glob.glob(f"{self.image_dir}/*")
+        
+        for file in files:
+            with open(file, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+                images.append(encoded_string.decode("utf-8"))
+                
+        with open(self.output_images, "w") as output_file:
+            json.dump(images, output_file)
+        
+        
     def get_notes(self, slides):
         '''
         Return the notes from the slides
@@ -132,21 +145,18 @@ class Slides:
             except KeyError as error:
                 notes.append("None")
                 
-        return notes
-                
-                
+        return notes     
+    
+    
     def export_notes(self, notes):
         '''
         Export the notes to a json file for the frontend
         '''
         
-        with open("notes.json", "w") as output_file:
+        with open(self.output_notes, "w") as output_file:
             json.dump(notes, output_file)
-        
             
-        
-    
-    
+               
 def main():
     '''
     Main run for testing.
