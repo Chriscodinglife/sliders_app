@@ -64,6 +64,16 @@ class Slides:
             files = glob.glob(f"{image_directory}/*")
             for file in files:
                 os.remove(file)
-                
+    
+    
+    def get_presentation_slides(self):
+        '''
+        Return the slides of the presentation
+        '''
+        service = build('slides', 'v1', credentials=self.creds)
+        presentation = service.presentations().get(presentationId=self.presentation_id).execute()
+        slides = presentation.get('slides')
+        
+        return slides
     
     
