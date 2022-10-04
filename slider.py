@@ -21,12 +21,12 @@ class Slides:
         Initialize the class with the following attributes:
         '''
         self.creds = None
-        self.scopes = [f"{os.getenv('SCOPES')}"]
-        self.presentation_id = os.getenv('PRESENTATION_ID')
         self.service = None
         self.image_dir = "images"
         self.output_notes = "notes.json"
         self.output_images = "images.json"
+        self.scopes = [f"{os.getenv('SCOPES')}"]
+        self.presentation_id = os.getenv('PRESENTATION_ID')
         
         
     def get_credentials(self):
