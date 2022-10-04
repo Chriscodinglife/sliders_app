@@ -110,6 +110,20 @@ class Slides:
             if image_download.status_code == 200:
                 with open(f"{self.image_dir}/image_{i}.png", 'wb') as output_image:
                     output_image.write(image_download.content)
+                    
+    
+    def resize_images(self):
+        '''
+        Resize the images to 800x600
+        '''
+        
+        base_width = 1102
+        for file in sorted(os.listdir(self.image_dir), key=os.path.getmtime):
+            image = Image.open(file)
+            width_percent = (base_width/float(image.size[0]))
+            height_size = int((float(image.size[1])*float(width_percent)))
+            new_image = image.resize((base_width, height_size), Image.ANTIALIAS)
+            new_image.save(file)
                 
                        
     def export_images(self):
@@ -119,9 +133,7 @@ class Slides:
         
         images = []
         
-        files = glob.glob(f"{self.image_dir}/*")
-        
-        for file in files:
+        for file in sorted(os.listdir(self.image_dir), key=os.path.getmtime):
             with open(file, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
                 images.append(encoded_string.decode("utf-8"))
@@ -155,16 +167,3 @@ class Slides:
         
         with open(self.output_notes, "w") as output_file:
             json.dump(notes, output_file)
-            
-               
-def main():
-    '''
-    Main run for testing.
-    '''
-    
-    google_slides = Slides()
-    google_slides.get_credentials()
-    slides = google_slides.get_presentation_slides()
-
-if __name__ == "__main__":
-    main()
