@@ -116,3 +116,18 @@ class Slides:
             if image_download.status_code == 200:
                 with open(f"{self.image_dir}/image_{i}.png", 'wb') as output_image:
                     output_image.write(image_download.content)
+                    
+    
+    def get_notes(self):
+        '''
+        Return the notes from the slides
+        '''
+        
+        slides = self.get_presentation_slides()
+        
+        notes = []
+        
+        for slide in slides:
+            notes.append(slide.get("notesPage").get("notesProperties").get("notes"))
+            
+        return notes
