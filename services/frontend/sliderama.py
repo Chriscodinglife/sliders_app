@@ -64,7 +64,7 @@ class Sliderama:
                 # Set the welcome text
                 self.welcome_text = sys.argv[5]
             
-        self.master_window.title = self.welcome_text
+        self.master_window.title(self.welcome_text)
         all_bundles = AppKit.NSBundle.allBundles()
         for bundle in all_bundles:
             info = bundle.infoDictionary()
