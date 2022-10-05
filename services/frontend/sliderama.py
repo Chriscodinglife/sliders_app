@@ -252,3 +252,13 @@ class Sliderama:
         Run the application
         '''
         self.master_window.mainloop()
+        
+
+def main():
+    '''Run the app'''
+    app = Sliderama()
+    app.run()
+    
+
+if __name__ == '__main__':
+    main()
