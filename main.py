@@ -27,4 +27,5 @@ def generate_slides():
     '''
     Generate new slides upon request and return a success message
     '''
-    slide_status = slider.run()
+    slider.run()
+    return {"slide_status": "success"}
