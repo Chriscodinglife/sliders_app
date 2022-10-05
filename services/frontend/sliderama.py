@@ -43,7 +43,7 @@ class Sliderama:
         '''
         
         # Change the flag to True to test locally
-        self.troubleshoot_mode = False
+        self.troubleshoot_mode = True
         
         # Set some names for colors to use later
         self.black_color = '#000000'
@@ -53,11 +53,16 @@ class Sliderama:
         # Create the main window
         self.master_window = tk.Tk()
         
-        # Set the title of the main window
-        if sys.argv[5]:
-            self.welcome_text = sys.argv[5]
+        # Check for sysargs to determine if we are running locally or not
+        if self.troubleshoot_mode:
+            self.welcome_text = 'Welcome'
+            self.backend_url = 'http://localhost:8000'
         else:
-            self.welcoome_text = 'Welcome'
+            if sys.argv[4]:
+                # Set the backend url
+                self.backend_url = sys.argv[4]
+                # Set the welcome text
+                self.welcome_text = sys.argv[5]
             
         self.master_window.title = self.welcome_text
         all_bundles = AppKit.NSBundle.allBundles()
@@ -69,7 +74,7 @@ class Sliderama:
         # Start out with some generic slide info
         self.starting_slide = 0
         self.length_of_slides = 10
-        self.ending_slide = length_of_slides - 1
+        self.ending_slide = self.length_of_slides - 1
         
         # Get the size of the main screen of the user
         self.screen_width = self.master_window.winfo_screenwidth()
@@ -134,7 +139,8 @@ class Sliderama:
         self.top_canvas.grid(row=self.row,
                              rowspan=self.rowspan,
                              column=self.column,
-                             columnspan=self.columnspan)
+                             columnspan=self.columnspan,
+                             sticky='n')
         
         #### PROGRESS BAR ####
         self.progbar_y_adjust = 125
@@ -193,7 +199,7 @@ class Sliderama:
                                anchor="center")
             
         #### ACTION BUTTON ####
-        self.action_button_y_adjust - 170
+        self.action_button_y_adjust = 170
         self.action_button_x_pos = self.window_width_middle
         self.action_button_y_pos = self.window_height - self.action_button_y_adjust
         
@@ -204,13 +210,6 @@ class Sliderama:
                                  y=self.action_button_y_pos,
                                  anchor="center")
         self.action_button.place_forget()
-
-        # Set the URL for the backend
-        if sys.argv[4]:
-            self.backend_url = sys.argv[4]
-        else:
-            # Use this URL for Testing
-            self.backend_url = 'http://127.0.0.1:8000'
        
             
     def check_back_end_status(self):
@@ -249,15 +248,17 @@ class Sliderama:
 
     def run(self):
         '''
-        Run the application
+        Run some checks before starting the application
         '''
-        self.master_window.mainloop()
+        self.length_of_slides = self.get_length_of_slides()
         
 
 def main():
     '''Run the app'''
     app = Sliderama()
     app.run()
+    app.master_window.mainloop()
+    
     
 
 if __name__ == '__main__':
