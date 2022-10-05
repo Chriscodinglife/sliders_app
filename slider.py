@@ -22,6 +22,7 @@ class Slides:
         '''
         self.creds = None
         self.service = None
+        self.slides = None
         self.image_dir = "images"
         self.output_notes = "notes.json"
         self.output_images = "images.json"
@@ -73,11 +74,11 @@ class Slides:
         
         try:
             presentation = self.service.presentations().get(presentationId=self.presentation_id).execute()
-            slides = presentation.get('slides')
+            self.slides = presentation.get('slides')
         except HttpError as error:
             print(error)
         
-        return slides
+        return self.slides
     
     
     def print_slides(self):
