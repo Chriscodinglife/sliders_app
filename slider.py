@@ -127,7 +127,15 @@ class Slides:
         for file in sorted(files, key=os.path.getmtime):
             images.append(file)
             
-        print(images)
+        return images
+    
+    
+    def get_number_of_slides(self, slides):
+        '''
+        Return the number of slides in the presentation
+        '''
+        
+        return len(slides)
     
     
     def resize_images(self, images):
@@ -149,15 +157,15 @@ class Slides:
         Export the images to a json file for the frontend
         '''
         
-        images = []
+        binary_images = []
         
         for file in images:
             with open(file, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
-                images.append(encoded_string.decode("utf-8"))
+                binary_images.append(encoded_string.decode("utf-8"))
                 
         with open(self.output_images, "w") as output_file:
-            json.dump(images, output_file)
+            json.dump(binary_images, output_file)
         
         
     def get_notes(self, slides):
@@ -168,7 +176,6 @@ class Slides:
         notes = []
         
         for i, slide in enumerate(slides):
-            #notes.append(slide.get("slideProperties").get("notesPage").get("notesProperties").get("speakerNotesObjectId"))
             temp = slide.get("slideProperties").get("notesPage").get("pageElements")
             try:
                 notes.append(temp[1]["shape"]["text"]["textElements"][1]['textRun']['content'])
