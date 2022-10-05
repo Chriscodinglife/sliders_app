@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from slider import Slider
+from slider import Slides
 
 app = FastAPI()
 
-slider = Slider()
+slider = Slides()
 
 @app.get("/ping", status_code=200)
 def ping():
