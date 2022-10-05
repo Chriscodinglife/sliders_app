@@ -13,13 +13,13 @@ def ping():
     return {"Hello": "World"}
 
 
-@app.get("/total_slides", status_code=200)
-def total_slides():
+@app.get("/len", status_code=200)
+def len():
     '''
     Return the total number of slides in the presentation
     '''
     slides = slider.get_number_of_slides()
-    return {"total_slides": len(slides)}
+    return {"total_slides": slides}
 
 
 @app.get("/generate_slides", status_code=200)

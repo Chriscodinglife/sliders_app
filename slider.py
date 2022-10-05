@@ -22,7 +22,6 @@ class Slides:
         '''
         self.creds = None
         self.service = None
-        self.slides = None
         self.image_dir = "images"
         self.output_notes = "notes.json"
         self.output_images = "images.json"
@@ -131,12 +130,12 @@ class Slides:
         return images
     
     
-    def get_number_of_slides(self, slides):
+    def get_number_of_slides(self):
         '''
         Return the number of slides in the presentation
         '''
         
-        return len(slides)
+        return len(os.listdir(self.image_dir))
     
     
     def resize_images(self, images):
