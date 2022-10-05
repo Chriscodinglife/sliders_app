@@ -5,6 +5,7 @@ app = FastAPI()
 
 slider = Slides()
 
+
 @app.get("/ping", status_code=200)
 def ping():
     '''
