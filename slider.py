@@ -113,13 +113,30 @@ class Slides:
                     output_image.write(image_download.content)
                     
     
-    def resize_images(self):
+    def get_ordered_images(self):
+        '''
+        Return the images in order
+        '''
+        
+        files = []
+        images = []
+        
+        for file in os.listdir(self.image_dir):
+            files.append(f"{self.image_dir}/{file}")
+        
+        for file in sorted(files, key=os.path.getmtime):
+            images.append(file)
+            
+        print(images)
+    
+    
+    def resize_images(self, images):
         '''
         Resize the images to 800x600
         '''
         
         base_width = 1102
-        for file in sorted(os.listdir(self.image_dir), key=os.path.getmtime):
+        for file in images:
             image = Image.open(file)
             width_percent = (base_width/float(image.size[0]))
             height_size = int((float(image.size[1])*float(width_percent)))
@@ -127,14 +144,14 @@ class Slides:
             new_image.save(file)
                 
                        
-    def export_images(self):
+    def export_images(self, images):
         '''
         Export the images to a json file for the frontend
         '''
         
         images = []
         
-        for file in sorted(os.listdir(self.image_dir), key=os.path.getmtime):
+        for file in images:
             with open(file, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
                 images.append(encoded_string.decode("utf-8"))
@@ -179,10 +196,12 @@ class Slides:
         self.fresh_image_directory()
         slides = self.get_presentation_slides()
         self.download_images(slides)
-        self.resize_images()
-        self.export_images()
+        images = self.get_ordered_images()
+        self.resize_images(images)
+        self.export_images(images)
         notes = self.get_notes(slides)
         self.export_notes(notes)
+        
         
         
 def main():
