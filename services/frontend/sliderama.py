@@ -251,13 +251,13 @@ class Sliderama:
         Run some checks before starting the application
         '''
         self.length_of_slides = self.get_length_of_slides()
+        self.master_window.mainloop()
         
 
 def main():
     '''Run the app'''
     app = Sliderama()
     app.run()
-    app.master_window.mainloop()
     
     
 
