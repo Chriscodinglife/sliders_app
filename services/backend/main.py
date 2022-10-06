@@ -23,7 +23,7 @@ def len():
     return {"total_slides": slides}
 
 
-@app.get("/generate_slides", status_code=200)
+@app.post("/generate_slides", status_code=200)
 def generate_slides():
     '''
     Generate new slides upon request and return a success message
