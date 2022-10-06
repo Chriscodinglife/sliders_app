@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 
@@ -25,6 +26,7 @@ class Slides:
         self.image_dir = "images"
         self.output_notes = "notes.json"
         self.output_images = "images.json"
+        self.cred_file = os.getenv('CLIENT_SECRET_FILE')
         self.scopes = [f"{os.getenv('SCOPES')}"]
         self.presentation_id = os.getenv('PRESENTATION_ID')
         
@@ -34,21 +36,24 @@ class Slides:
         Set the credentials for the Google Slides API
         '''
         
-        if os.path.exists('token.json'):
-            self.creds = Credentials.from_authorized_user_file('token.json', self.scopes)
-        # If there are no (valid) credentials available, let the user log in.
-        if not self.creds or not self.creds.valid:
-            if self.creds and self.creds.expired and self.creds.refresh_token:
-                self.creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', self.scopes)
-                self.creds = flow.run_local_server(port=0)
-            # Save the credentials for the next run
-            with open('token.json', 'w') as token:
-                token.write(self.creds.to_json())
+        # if os.path.exists('token.json'):
+        #     self.creds = Credentials.from_authorized_user_file('token.json', self.scopes)
+        # # If there are no (valid) credentials available, let the user log in.
+        # if not self.creds or not self.creds.valid:
+        #     if self.creds and self.creds.expired and self.creds.refresh_token:
+        #         self.creds.refresh(Request())
+        #     else:
+        #         flow = InstalledAppFlow.from_client_secrets_file(
+        #             'credentials.json', self.scopes)
+        #         self.creds = flow.run_local_server(port=0)
+        #     # Save the credentials for the next run
+        #     with open('token.json', 'w') as token:
+        #         token.write(self.creds.to_json())
                 
-        self.service = build('slides', 'v1', credentials=self.creds)
+        self.credentials = service_account.Credentials.from_service_account_file(self.cred_file)
+        self.scoped_credentials = self.credentials.with_scopes(self.scopes)
+        self.service = build('slides', 'v1', credentials=self.scoped_credentials)
+        #self.service = build('slides', 'v1', credentials=self.creds)
         
     
     def fresh_image_directory(self):
