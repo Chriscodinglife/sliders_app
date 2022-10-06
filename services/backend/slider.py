@@ -166,6 +166,17 @@ class Slides:
                 
         with open(self.output_images, "w") as output_file:
             json.dump(binary_images, output_file)
+            
+            
+    def get_image(self, slide_number):
+        '''
+        Return the image at a specific slide number
+        '''
+        
+        with open(self.output_images, "r") as input_file:
+            images = json.load(input_file)
+        
+        return images[slide_number]
         
         
     def get_notes(self, slides):
@@ -182,7 +193,7 @@ class Slides:
             except KeyError as error:
                 notes.append("None")
                 
-        return notes     
+        return notes   
     
     
     def export_notes(self, notes):
@@ -192,6 +203,17 @@ class Slides:
         
         with open(self.output_notes, "w") as output_file:
             json.dump(notes, output_file)
+            
+        
+    def get_note(self, slide_number):
+        '''
+        Return the note for a specific slide
+        '''
+        
+        with open(self.output_notes, "r") as input_file:
+            notes = json.load(input_file)
+            
+        return notes[slide_number].split('\n')[0] 
             
     
     def run(self):
