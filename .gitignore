@@ -1,0 +1,11 @@
+*.env
+*token.json
+*credentials.json
+*output.txt
+*output.json
+*images/
+*notes.json
+*images.json
+*__pycache__/
+*.DS_Store
+*client_secrets.json

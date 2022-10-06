@@ -1,0 +1,12 @@
+*.env
+*token.json
+*credentials.json
+*output.txt
+*output.json
+*images/
+*notes.json
+*images.json
+*__pycache__/
+.gitignore
+*.DS_Store
+.git
