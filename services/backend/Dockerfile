@@ -7,6 +7,7 @@ COPY requirements.txt requirements.txt
 COPY slider.py slider.py
 COPY main.py main.py
 COPY client_secrets.json client_secrets.json
+COPY .env .env
 
 RUN pip3 install -r requirements.txt
 
