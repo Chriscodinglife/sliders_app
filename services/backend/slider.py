@@ -35,25 +35,10 @@ class Slides:
         '''
         Set the credentials for the Google Slides API
         '''
-        
-        # if os.path.exists('token.json'):
-        #     self.creds = Credentials.from_authorized_user_file('token.json', self.scopes)
-        # # If there are no (valid) credentials available, let the user log in.
-        # if not self.creds or not self.creds.valid:
-        #     if self.creds and self.creds.expired and self.creds.refresh_token:
-        #         self.creds.refresh(Request())
-        #     else:
-        #         flow = InstalledAppFlow.from_client_secrets_file(
-        #             'credentials.json', self.scopes)
-        #         self.creds = flow.run_local_server(port=0)
-        #     # Save the credentials for the next run
-        #     with open('token.json', 'w') as token:
-        #         token.write(self.creds.to_json())
                 
         self.credentials = service_account.Credentials.from_service_account_file(self.cred_file)
         self.scoped_credentials = self.credentials.with_scopes(self.scopes)
         self.service = build('slides', 'v1', credentials=self.scoped_credentials)
-        #self.service = build('slides', 'v1', credentials=self.creds)
         
     
     def fresh_image_directory(self):
