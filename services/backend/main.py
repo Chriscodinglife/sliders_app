@@ -32,6 +32,15 @@ def generate_slides():
     return {"slide_status": "success"}
 
 
+@app.get("/generate_test", status_code=200)
+def generate_slides():
+    '''
+    Generate new slides upon request and return a success message
+    '''
+    slider.run()
+    return {"slide_status": "success"}
+
+
 @app.get("/notes/{slide_number}", status_code=200)
 def get_notes(slide_number: int):
     '''
