@@ -24,7 +24,6 @@ This is built upon Tkinter.
 import os
 import sys
 import json
-import AppKit
 import requests
 import webbrowser
 import tkinter.ttk
@@ -61,20 +60,16 @@ class Sliderama:
             if sys.argv[4]:
                 # Set the backend url
                 self.backend_url = sys.argv[4]
+            if sys.argv[5]:
                 # Set the welcome text
                 self.welcome_text = sys.argv[5]
             
         self.master_window.title(self.welcome_text)
-        all_bundles = AppKit.NSBundle.allBundles()
-        for bundle in all_bundles:
-            info = bundle.infoDictionary()
-            info['CFBundleName'] = self.welcome_text
-            info['CFBundleDisplayName'] = self.welcome_text
         
         # Start out with some generic slide info
         self.starting_slide = 0
         self.length_of_slides = 10
-        self.ending_slide = self.length_of_slides - 1
+        self.ending_slide = self.length_of_slides
         
         # Get the size of the main screen of the user
         self.screen_width = self.master_window.winfo_screenwidth()
@@ -82,11 +77,11 @@ class Sliderama:
         
         # Set the base size of the main window
         self.set_window_width = 1280
-        self.set_window_height = 720
+        self.set_window_height = 820
         
         self.master_window.configure(width=f"{self.set_window_width}", 
                                      height=f"{self.set_window_height}")
-        self.master_window.resizable(True, True)
+        self.master_window.resizable(False, False)
         self.master_window.update()
         
         # Get the size of the main window
@@ -145,23 +140,25 @@ class Sliderama:
         #### PROGRESS BAR ####
         self.progbar_y_adjust = 125
         self.progbar_length = 600
+        self.progbar_thickness = 5
         self.progbar_x_pos = self.window_width_middle
         self.progbar_y_pos = self.window_height - self.progbar_y_adjust
+        self.anchor = 'center'
 
         self.style = tkinter.ttk.Style()
         self.style.theme_use('alt')
-        self.style.configure("green.Horizontal.TProgressbar", thickness=5)
+        self.style.configure("green.Horizontal.TProgressbar", thickness=self.progbar_thickness)
         self.progbar = tkinter.ttk.Progressbar(self.master_window)
         self.progbar.configure(length=f"{self.progbar_length}",
                                maximum=self.ending_slide,
                                orient='horizontal',
                                mode='determinate',
-                               value=self.starting_slide)
+                               value=self.starting_slide,
+                               style="green.Horizontal.TProgressbar")
         self.progbar.place(x=self.progbar_x_pos,
                            y=self.progbar_y_pos,
-                           anchor='center')
-        
-        
+                           anchor=self.anchor)
+         
         #### NAV BUTTONS ####
         self.nav_button_x_adjust = 130
         self.nav_button_y_adjust = 60
@@ -180,13 +177,13 @@ class Sliderama:
         self.next_button_y_pos = self.window_height - self.nav_button_y_adjust
         
         self.back_button = tk.Button(self.master_window)
-        self.back_button.configure(text=self.back_text,
+        self.back_button.configure(text=self.close_text,
                                    highlightbackground=self.black_color,
                                    width=self.button_width,
                                    command=self.close_command)
         self.back_button.place(x=self.back_button_x_pos,
                                y=self.back_button_y_pos,
-                               anchor="center")
+                               anchor=self.anchor)
         
         self.next_button = tk.Button(self.master_window)
         self.next_button.configure(default=self.default,
@@ -196,7 +193,7 @@ class Sliderama:
                                    command=self.next_button_command)
         self.next_button.place(x=self.next_button_x_pos,
                                y=self.next_button_y_pos,
-                               anchor="center")
+                               anchor=self.anchor)
             
         #### ACTION BUTTON ####
         self.action_button_y_adjust = 170
@@ -208,7 +205,7 @@ class Sliderama:
                                      text=self.default_button_text)
         self.action_button.place(x=self.action_button_x_pos,
                                  y=self.action_button_y_pos,
-                                 anchor="center")
+                                 anchor=self.anchor)
         self.action_button.place_forget()
        
             
@@ -229,30 +226,122 @@ class Sliderama:
         '''
         self.slides = requests.get(f"{self.backend_url}/len")
         if self.slides.status_code == 200:
-            return self.slides.json()
+            self.length_of_slides = self.slides.json()['total_slides']
+            self.progbar.configure(maximum=self.length_of_slides)
+            self.ending_slide = self.length_of_slides
+            
+    
+    def add_to_progbar(self):
+        '''
+        Increment the progress bar by 1 and return the current value
+        '''
+        
+        self.progbar['value'] += 1
+        
+        if self.progbar['value'] >= self.ending_slide:
+            self.progbar['value'] = self.ending_slide
+            
+    
+    def set_back_button(self):
+        '''
+        Make the back button visible
+        '''
+        self.back_button.configure(text=self.back_text,
+                                    command=self.back_button_command)
+        self.back_button.place(x=self.back_button_x_pos,
+                                y=self.back_button_y_pos,
+                                anchor=self.anchor)
         
         
+    def set_close_button(self):
+        '''
+        Make the close button visible
+        '''
+        self.back_button.configure(text=self.close_text,
+                                   command=self.close_command)
+        
+        
+    def set_finish_button(self):
+        '''
+        Make the finish button visible and the back button dissappear
+        '''
+        self.back_button.place_forget()
+        self.next_button.configure(text=self.finish_text,
+                                   command=self.close_command)
+        self.next_button.place(x=self.window_width_middle,
+                               y=self.next_button_y_pos,
+                               anchor=self.anchor)
+            
+            
     def close_command(self):
         '''
         Close the application
         '''
         self.master_window.quit()
         
+        
+    def subtract_from_progbar(self):
+        '''
+        Decrement the progress bar by 1 and return the current value
+        '''
+        
+        self.progbar['value'] -= 1
+        
+        if self.progbar['value'] <= self.starting_slide:
+            self.progbar['value'] = self.starting_slide
+
     
     def next_button_command(self):
         '''
-        Advance to the next slide
+        Command for the next button to increment the progress bar
         '''
-        pass
+        
+        self.add_to_progbar()
+        self.current_slide = self.progbar['value']
+        
+        if self.current_slide >= 1 and self.current_slide < self.ending_slide:
+            self.set_back_button()
+        elif self.current_slide == self.ending_slide:
+            self.set_finish_button()
+
+        self.master_window.update()
+        
+        
+    def back_button_command(self):
+        '''
+        Command for the back button to decrement the progress bar
+        '''
+        self.subtract_from_progbar()
+        self.current_slide = self.progbar['value']
+        
+        if self.current_slide == self.starting_slide:
+            self.set_close_button()
+            
+        self.master_window.update()     
+            
     
+    def get_image(self):
+        '''
+        Get the image from the backend
+        '''
+        self.image = requests.get(f"{self.backend_url}/image/{self.current_slide}")
+        if self.image.status_code == 200:
+            self.image = self.image.json()['image']
+            self.image = self.image.encode()
+            self.image = base64.decodebytes(self.image)
+            self.image = Image.open(io.BytesIO(self.image))
+            self.image = ImageTk.PhotoImage(self.image)
+            return self.image
+
 
     def run(self):
         '''
         Run some checks before starting the application
         '''
-        self.length_of_slides = self.get_length_of_slides()
+        self.get_length_of_slides()
         self.master_window.mainloop()
         
+    
 
 def main():
     '''Run the app'''
