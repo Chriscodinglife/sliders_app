@@ -30,6 +30,7 @@ import tkinter.ttk
 import tkinter as tk
 from tkinter import * 
 from tkinter.ttk import *
+from subprocess import Popen
 from Cocoa import NSRunningApplication, NSApplicationActivateIgnoringOtherApps
 
 
@@ -69,7 +70,7 @@ class Sliderama:
         # Start out with some generic slide info
         self.starting_slide = 0
         self.length_of_slides = 10
-        self.ending_slide = self.length_of_slides
+        self.ending_slide = self.length_of_slides - 1
         
         # Get the size of the main screen of the user
         self.screen_width = self.master_window.winfo_screenwidth()
@@ -202,15 +203,16 @@ class Sliderama:
         
         self.action_button = tk.Button(self.master_window)
         self.action_button.configure(default=self.default,
-                                     text=self.default_button_text)
+                                     text=self.action_button_text)
         self.action_button.place(x=self.action_button_x_pos,
                                  y=self.action_button_y_pos,
                                  anchor=self.anchor)
         self.action_button.place_forget()
         
-        self.check_list = ['http://', 'https://', 'jamfselfservice://', 'chrome-extension://', '/Applications']
+        self.check_list = ['http://', 'https://', 'jamfselfservice://', 'chrome-extension://', '/Applications', '/System']
         self.web_list = ['http://', 'https://', 'jamfselfservice://', 'chrome-extension://']
-        self.app_list = ['/Applications']
+        self.app_list = ['/Applications', '/System']
+        self.note = ""
        
             
     def check_back_end_status(self):
@@ -231,8 +233,8 @@ class Sliderama:
         self.slides = requests.get(f"{self.backend_url}/len")
         if self.slides.status_code == 200:
             self.length_of_slides = self.slides.json()['total_slides']
-            self.progbar.configure(maximum=self.length_of_slides)
-            self.ending_slide = self.length_of_slides
+            self.progbar.configure(maximum=self.length_of_slides - 1)
+            self.ending_slide = self.length_of_slides - 1
             
     
     def add_to_progbar(self):
@@ -362,7 +364,7 @@ class Sliderama:
         self.master_window.update()
         
         
-    def action_button_command(self, note):
+    def action_button_command(self):
         '''
         Set the action button command
         '''
@@ -371,15 +373,9 @@ class Sliderama:
         
         if any(call in self.note for call in self.web_list):
             if os.path.exists(self.chrome_path):
-                try:
-                    webbrowser.get(self.chrome_exe).open(self.note)
-                except Exception as e:
-                    print("Google Chrome not found")
+                webbrowser.get(self.chrome_exe).open(self.note)
         elif any(call in self.note for call in self.app_list):
-            try:
-                subprocess.Popen(['open', '-a', self.note])
-            except Exception as e:
-                print("App not found")
+            Popen(['open', self.note])
             
         
     def set_note(self, slide_number):
@@ -395,7 +391,7 @@ class Sliderama:
             self.action_button.place(x=self.action_button_x_pos,
                         y=self.action_button_y_pos,
                         anchor=self.anchor)
-            self.action_button.configure(command=self.action_button_command(self.note))
+            self.action_button.configure(command=self.action_button_command)
         else:
             self.action_button.place_forget()
             
