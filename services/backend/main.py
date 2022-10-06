@@ -30,3 +30,21 @@ def generate_slides():
     '''
     slider.run()
     return {"slide_status": "success"}
+
+
+@app.get("/notes/{slide_number}", status_code=200)
+def get_notes(slide_number: int):
+    '''
+    Return the notes for a given slide
+    '''
+    note = slider.get_note(slide_number)
+    return {"note": note}
+
+
+@app.get("/images/{slide_number}", status_code=200)
+def get_image(slide_number: int):
+    '''
+    Return the image for a given slide
+    '''
+    image = slider.get_image(slide_number)
+    return {"image": image}
