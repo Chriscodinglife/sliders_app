@@ -56,7 +56,7 @@ class Sliderama:
         # Check for sysargs to determine if we are running locally or not
         if self.troubleshoot_mode:
             self.welcome_text = 'Welcome'
-            self.backend_url = 'https://9532-2603-7000-e340-900f-2020-2e27-a958-c7ad.ngrok.io'
+            self.backend_url = 'https://788b-2603-7000-e340-900f-2020-2e27-a958-c7ad.ngrok.io'
         else:
             if sys.argv[4]:
                 # Set the backend url
