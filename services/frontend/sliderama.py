@@ -166,7 +166,7 @@ class Sliderama:
         self.close_text = 'Close'
         self.next_text = 'Next'
         self.finish_text = 'Finish'
-        self.default_button_text = 'Complete This Task'
+        self.action_button_text = 'Complete This Task'
         self.button_width = 8
         self.default = 'active'
         
@@ -207,6 +207,10 @@ class Sliderama:
                                  y=self.action_button_y_pos,
                                  anchor=self.anchor)
         self.action_button.place_forget()
+        
+        self.check_list = ['http://', 'https://', 'jamfselfservice://', 'chrome-extension://', '/Applications']
+        self.web_list = ['http://', 'https://', 'jamfselfservice://', 'chrome-extension://']
+        self.app_list = ['/Applications']
        
             
     def check_back_end_status(self):
@@ -299,6 +303,9 @@ class Sliderama:
         self.add_to_progbar()
         self.current_slide = self.progbar['value']
         
+        self.set_slide(self.current_slide)
+        self.set_note(self.current_slide)
+        
         if self.current_slide >= 1 and self.current_slide < self.ending_slide:
             self.set_back_button()
         elif self.current_slide == self.ending_slide:
@@ -314,6 +321,9 @@ class Sliderama:
         self.subtract_from_progbar()
         self.current_slide = self.progbar['value']
         
+        self.set_slide(self.current_slide)
+        self.set_note(self.current_slide)
+        
         if self.current_slide == self.starting_slide:
             self.set_close_button()
             
@@ -326,7 +336,7 @@ class Sliderama:
         '''
         self.image_response = requests.get(f"{self.backend_url}/images/{slide_number}")
         if self.image_response.status_code == 200:
-            self.image = self.image.json()['image']
+            self.image = self.image_response.json()['image']
             return self.image
         
     
@@ -336,7 +346,7 @@ class Sliderama:
         '''
         self.note_response = requests.get(f"{self.backend_url}/notes/{slide_number}")
         if self.note_response.status_code == 200:
-            self.note = self.note.json()['note']
+            self.note = self.note_response.json()['note']
             return self.note
         
         
@@ -355,16 +365,21 @@ class Sliderama:
     def action_button_command(self, note):
         '''
         Set the action button command
-        ''''
+        '''
         self.chrome_exe = 'open -a /Applications/Google\ Chrome.app %s'
         self.chrome_path = '/Applications/Google Chrome.app'
-        if os.path.exists(self.chrome_path):
+        
+        if any(call in self.note for call in self.web_list):
+            if os.path.exists(self.chrome_path):
+                try:
+                    webbrowser.get(self.chrome_exe).open(self.note)
+                except Exception as e:
+                    print("Google Chrome not found")
+        elif any(call in self.note for call in self.app_list):
             try:
-                webbrowser.get(self.chrome_exe).open(note)
+                subprocess.Popen(['open', '-a', self.note])
             except Exception as e:
-                print("Google Chrome not found")
-        else:
-            os.system(f"open {note}")
+                print("App not found")
             
         
     def set_note(self, slide_number):
@@ -375,12 +390,14 @@ class Sliderama:
         
         if self.note == "None":
             self.action_button.place_forget()
-        else:
+        
+        elif any(call in self.note for call in self.check_list):
             self.action_button.place(x=self.action_button_x_pos,
                         y=self.action_button_y_pos,
                         anchor=self.anchor)
-            self.action_button.configure(text=self.action_button_text,
-                                         command=self.action_button_command(self.note))
+            self.action_button.configure(command=self.action_button_command(self.note))
+        else:
+            self.action_button.place_forget()
             
         self.master_window.update()
     
@@ -390,6 +407,8 @@ class Sliderama:
         Run some checks before starting the application
         '''
         self.get_length_of_slides()
+        self.set_slide(0)
+        self.set_note(0)
         self.master_window.mainloop()
         
     
