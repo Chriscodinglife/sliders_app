@@ -143,7 +143,7 @@ class Slides:
         Resize the images to 800x600
         '''
         
-        base_width = 1102
+        base_width = 1280
         for file in images:
             image = Image.open(file)
             width_percent = (base_width/float(image.size[0]))
