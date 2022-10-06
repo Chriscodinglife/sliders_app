@@ -322,16 +322,22 @@ class Sliderama:
     
     def get_image(self):
         '''
-        Get the image from the backend
+        Return the image data from the backend
         '''
-        self.image = requests.get(f"{self.backend_url}/image/{self.current_slide}")
-        if self.image.status_code == 200:
+        self.image_response = requests.get(f"{self.backend_url}/images/{self.current_slide}")
+        if self.image_response.status_code == 200:
             self.image = self.image.json()['image']
-            self.image = self.image.encode()
-            self.image = base64.decodebytes(self.image)
-            self.image = Image.open(io.BytesIO(self.image))
-            self.image = ImageTk.PhotoImage(self.image)
             return self.image
+        
+    
+    def get_note(self):
+        '''
+        Return the note data from the backend
+        '''
+        self.note_response = requests.get(f"{self.backend_url}/notes/{self.current_slide}")
+        if self.note_response.status_code == 200:
+            self.note = self.note.json()['note']
+            return self.note
 
 
     def run(self):
