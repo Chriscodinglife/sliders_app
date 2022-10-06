@@ -166,7 +166,7 @@ class Sliderama:
         self.close_text = 'Close'
         self.next_text = 'Next'
         self.finish_text = 'Finish'
-        self.default_button_text = 'Button'
+        self.default_button_text = 'Complete This Task'
         self.button_width = 8
         self.default = 'active'
         
@@ -320,25 +320,70 @@ class Sliderama:
         self.master_window.update()     
             
     
-    def get_image(self):
+    def get_image(self, slide_number):
         '''
         Return the image data from the backend
         '''
-        self.image_response = requests.get(f"{self.backend_url}/images/{self.current_slide}")
+        self.image_response = requests.get(f"{self.backend_url}/images/{slide_number}")
         if self.image_response.status_code == 200:
             self.image = self.image.json()['image']
             return self.image
         
     
-    def get_note(self):
+    def get_note(self, slide_number):
         '''
         Return the note data from the backend
         '''
-        self.note_response = requests.get(f"{self.backend_url}/notes/{self.current_slide}")
+        self.note_response = requests.get(f"{self.backend_url}/notes/{slide_number}")
         if self.note_response.status_code == 200:
             self.note = self.note.json()['note']
             return self.note
-
+        
+        
+    def set_slide(self, slide_number):
+        '''
+        Set the slide image
+        '''
+        self.image = self.get_image(slide_number)
+        
+        self.slide_image = tk.PhotoImage(data=self.image)
+        self.top_canvas.create_image(0, 0, image=self.slide_image, anchor='nw')
+            
+        self.master_window.update()
+        
+        
+    def action_button_command(self, note):
+        '''
+        Set the action button command
+        ''''
+        self.chrome_exe = 'open -a /Applications/Google\ Chrome.app %s'
+        self.chrome_path = '/Applications/Google Chrome.app'
+        if os.path.exists(self.chrome_path):
+            try:
+                webbrowser.get(self.chrome_exe).open(note)
+            except Exception as e:
+                print("Google Chrome not found")
+        else:
+            os.system(f"open {note}")
+            
+        
+    def set_note(self, slide_number):
+        '''
+        Set the note text
+        '''
+        self.note = self.get_note(slide_number)
+        
+        if self.note == "None":
+            self.action_button.place_forget()
+        else:
+            self.action_button.place(x=self.action_button_x_pos,
+                        y=self.action_button_y_pos,
+                        anchor=self.anchor)
+            self.action_button.configure(text=self.action_button_text,
+                                         command=self.action_button_command(self.note))
+            
+        self.master_window.update()
+    
 
     def run(self):
         '''
