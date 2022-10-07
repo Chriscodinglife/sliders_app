@@ -24,7 +24,9 @@ This is built upon Tkinter.
 import os
 import sys
 import json
+import getpass
 import requests
+import subprocess
 import webbrowser
 import tkinter.ttk
 import tkinter as tk
@@ -42,29 +44,52 @@ class Sliderama:
         Initialize the Tkinter app with the following attributes:
         '''
         
-        # Change the flag to True to test locally
+        #### RUN CONFIGS ####
+        # Use this section to configure settings for running the app in different environments
+        
+        # Get current process and user info
+        self.parent_command = os.getpid()
+        self.jamf_binary = '/usr/local/jamf/bin/jamf'
+        self.current_user = None
+        
+        # Change the Troubleshoot Mode flag to True to test locally
+        # Set to False if running in production/JAMF
         self.troubleshoot_mode = True
-        
-        # Set some names for colors to use later
-        self.black_color = '#000000'
-        self.white_color = '#ffffff'
-        
-        #### MAIN WINDOW ####
-        # Create the main window
-        self.master_window = tk.Tk()
-        
-        # Check for sysargs to determine if we are running locally or not
         if self.troubleshoot_mode:
+            # Set the values below to test locally
             self.welcome_text = 'Welcome'
             self.backend_url = 'https://788b-2603-7000-e340-900f-2020-2e27-a958-c7ad.ngrok.io'
+            self.current_user = getpass.getuser()
+            self.app_icon_path = "/Library/Application Support/greenhouse/media/greenhouse_logo.png"
         else:
+            if sys.argv[3]:
+                # Set the current user based on JAMF
+                self.current_user = sys.argv[3]
             if sys.argv[4]:
                 # Set the backend url
                 self.backend_url = sys.argv[4]
             if sys.argv[5]:
                 # Set the welcome text
                 self.welcome_text = sys.argv[5]
-            
+            if sys.argv[6]:
+                # Set the app icon path
+                self.app_icon_path = sys.argv[6]
+            else:
+                self.app_icon_path = f"/Users/{self.current_user}/Library/Application Support/com.jamfsoftware.selfservice.mac/Documents/Images/brandingimage.png"
+                
+        #### MAIN WINDOW ####
+        # Create the main window
+        self.master_window = tk.Tk()
+        
+        # Create the app icon if available
+        if self.app_icon_path:
+            self.app_icon = tk.PhotoImage(file=self.app_icon_path)
+            self.master_window.call('wm', 'iconphoto', self.master_window._w, self.app_icon)
+        
+        # Set some names for colors to use later
+        self.black_color = '#000000'
+        self.white_color = '#ffffff'
+    
         self.master_window.title(self.welcome_text)
         
         # Start out with some generic slide info
