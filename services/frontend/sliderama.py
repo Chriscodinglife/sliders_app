@@ -60,7 +60,7 @@ class Sliderama:
             self.welcome_text = 'Welcome'
             self.backend_url = 'https://788b-2603-7000-e340-900f-2020-2e27-a958-c7ad.ngrok.io'
             self.current_user = getpass.getuser()
-            self.app_icon_path = "/Library/Application Support/greenhouse/media/greenhouse_logo.png"
+            self.app_icon_path = ""
             if self.check_back_end_status():
                 self.get_length_of_slides()
                 self.set_slide(0)
@@ -89,7 +89,7 @@ class Sliderama:
         self.master_window = tk.Tk()
         
         # Create the app icon if available
-        if self.app_icon_path:
+        if os.path.exists(self.app_icon_path):
             self.app_icon = tk.PhotoImage(file=self.app_icon_path)
             self.master_window.call('wm', 'iconphoto', self.master_window._w, self.app_icon)
         
@@ -434,16 +434,17 @@ class Sliderama:
         '''
         Run the Sliderama App
         '''
+        self.get_length_of_slides()
+        self.set_slide(0)
+        self.set_note(0)
         self.master_window.mainloop()
         
     
-
 def main():
     '''Run the app'''
     app = Sliderama()
     app.run()
     
     
-
 if __name__ == '__main__':
     main()
