@@ -61,6 +61,10 @@ class Sliderama:
             self.backend_url = 'https://788b-2603-7000-e340-900f-2020-2e27-a958-c7ad.ngrok.io'
             self.current_user = getpass.getuser()
             self.app_icon_path = "/Library/Application Support/greenhouse/media/greenhouse_logo.png"
+            if self.check_back_end_status():
+                self.get_length_of_slides()
+                self.set_slide(0)
+                self.set_note(0)
         else:
             if sys.argv[3]:
                 # Set the current user based on JAMF
@@ -76,6 +80,9 @@ class Sliderama:
                 self.app_icon_path = sys.argv[6]
             else:
                 self.app_icon_path = f"/Users/{self.current_user}/Library/Application Support/com.jamfsoftware.selfservice.mac/Documents/Images/brandingimage.png"
+            if not self.check_back_end_status():
+                print("Backend is not running")
+                sys.exit(1)
                 
         #### MAIN WINDOW ####
         # Create the main window
@@ -425,11 +432,8 @@ class Sliderama:
 
     def run(self):
         '''
-        Run some checks before starting the application
+        Run the Sliderama App
         '''
-        self.get_length_of_slides()
-        self.set_slide(0)
-        self.set_note(0)
         self.master_window.mainloop()
         
     
