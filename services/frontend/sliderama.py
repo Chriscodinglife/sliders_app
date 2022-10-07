@@ -1,22 +1,8 @@
 #!/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3
 
 '''
-              .c:.
-          ....dNO,
-       .cxxxxOXO'
-      .k0l...,dKo.
-      ;Kk.    ;Kk.
-      .l0xc::lOO:
-        'lKNNO:.
-       .:dKNXOl;.
-     .l0kl:;;:oOO:
-    .oXd.      'OK;
-    .xX:       .dNl
-     cKO,     .c0O,
-     .;xOxooodkOo'
-        .;ccc:,.
 
-This script is the front end for the Google Slides New Hire Onboarding app.
+This script is the front end for the sliders API.
 This is built upon Tkinter.
 
 '''
