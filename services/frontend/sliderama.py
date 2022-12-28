@@ -19,6 +19,7 @@ import tkinter as tk
 from tkinter import * 
 from tkinter.ttk import *
 from subprocess import Popen
+from multiprocessing import Process, Queue
 from Cocoa import NSRunningApplication, NSApplicationActivateIgnoringOtherApps
 
 
@@ -44,13 +45,9 @@ class Sliderama:
         if self.troubleshoot_mode:
             # Set the values below to test locally
             self.welcome_text = 'Welcome'
-            self.backend_url = 'https://788b-2603-7000-e340-900f-2020-2e27-a958-c7ad.ngrok.io'
+            self.backend_url = 'https://8bda-2603-7000-e340-900f-8c7d-5a3b-a097-ef0e.ngrok.io'
             self.current_user = getpass.getuser()
             self.app_icon_path = ""
-            if self.check_back_end_status():
-                self.get_length_of_slides()
-                self.set_slide(0)
-                self.set_note(0)
         else:
             if sys.argv[3]:
                 # Set the current user based on JAMF
@@ -426,11 +423,14 @@ class Sliderama:
         self.master_window.mainloop()
         
     
-def main():
+def run_app():
     '''Run the app'''
     app = Sliderama()
     app.run()
     
     
 if __name__ == '__main__':
-    main()
+    child_process = Process(target=run_app)
+    child_process.daemon = False
+    child_process.start()
+    exit()
