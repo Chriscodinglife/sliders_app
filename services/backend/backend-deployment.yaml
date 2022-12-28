@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slidersapp
+  labels:
+    app: slidersapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slidersapp
+  template:
+    metadata:
+      labels:
+        app: slidersapp
+    spec:
+      containers:
+        - name: slidersapp
+          image: slider
+          ports:
+          - containerPort: 5000
+          imagePullPolicy: Never
